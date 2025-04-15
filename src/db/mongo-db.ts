@@ -52,13 +52,16 @@ export const connectToDB = async () => {
 
         revokedTokensCollection = db.collection<RevokedTokenDBType>("revokedTokens");
         await revokedTokensCollection.createIndex({ token: 1 }, { unique: true });
+        await revokedTokensCollection.createIndex({ expiresAt: 1 }, { expireAfterSeconds: 0 });
 
         requestLogsCollection = db.collection<RequestLogType>("requestLogs");
         await requestLogsCollection.createIndex({ ip: 1, url: 1, date: 1 });
+        await requestLogsCollection.createIndex({ date: 1 }, { expireAfterSeconds: 60 });
 
         sessionsCollection = db.collection<SessionDBType>("sessions");
         await sessionsCollection.createIndex({ deviceId: 1 }, { unique: true });
         await sessionsCollection.createIndex({ userId: 1 });
+        await sessionsCollection.createIndex({ expiresDate: 1 }, { expireAfterSeconds: 0 });
 
         console.log("Successfully connected to MongoDB");
         return true;

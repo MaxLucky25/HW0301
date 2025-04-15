@@ -16,11 +16,14 @@ import { securityRouter } from './routers/securityRouter';
 
 
 const app = express();
+app.set('trust proxy', true);
+
 app.use(express.json());
 app.use(cors());
 app.use(cookieParser())
 app.use(logRequestMiddleware);
 app.use(requestCountMiddleware);
+
 
 app.use('/blogs', blogsRouter);
 app.use('/posts', postsRouter);
