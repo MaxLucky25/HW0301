@@ -16,11 +16,9 @@ export const jwtAuthMiddleware = (req: Request, res: Response, next: NextFunctio
 
     try {
         const decoded = jwt.verify(token, config.JWT_SECRET) as JwtPayload;
-        req.user = {
-            id: decoded.userId,
-            login: decoded.login,
-            email: decoded.email,
-        };
+            req.userId = decoded.userId
+            req.userLogin = decoded.login
+            req.userEmail = decoded.email
 
 
         next();

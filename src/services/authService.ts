@@ -35,7 +35,11 @@ export const authService = {
             expiresDate
         });
         return {
-            accessToken: jwtService.createAccessToken({ userId: user.id.toString() }),
+            accessToken: jwtService.createAccessToken({
+                userId: user.id,
+                login: user.login,
+                email: user.email,
+            }),
             refreshToken: jwtService.createRefreshToken(payload),
         };
     },
@@ -69,7 +73,11 @@ export const authService = {
         };
 
         return {
-            accessToken: jwtService.createAccessToken({ userId: payload.userId }),
+            accessToken: jwtService.createAccessToken({
+                userId: payload.userId,
+                login: payload.userLogin,
+                email: payload.userEmail,
+            }),
             refreshToken: jwtService.createRefreshToken(newPayload)
         };
     },

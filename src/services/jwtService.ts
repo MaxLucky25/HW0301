@@ -2,7 +2,7 @@ import jwt, { JwtPayload } from 'jsonwebtoken';
 import config from '../utility/config';
 
 export const jwtService = {
-    createAccessToken(payload: { userId: string }) {
+    createAccessToken(payload: { userId: string, login: string; email: string  }) {
         return jwt.sign(payload,
             config.JWT_SECRET,
             { expiresIn: config.JWT_EXPIRES_IN }as jwt.SignOptions

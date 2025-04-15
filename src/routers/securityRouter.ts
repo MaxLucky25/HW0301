@@ -9,7 +9,11 @@ export const securityRouter = Router();
 securityRouter.get("/devices",
     jwtAuthMiddleware,
     async (req: Request, res: Response) => {
-    const userId = req.user!.id;
+        const userId = req.userId;
+        if (!userId) {
+            res.sendStatus(401);
+            return;
+        }
     const sessions = await sessionRepository.findAllByUser(userId);
 
     const mapped = sessions.map(s => ({
