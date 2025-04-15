@@ -2,6 +2,7 @@ import { Router, Request, Response } from "express";
 import { jwtService } from "../services/jwtService";
 import { sessionRepository } from "../repositories/sessionRepository";
 import {jwtAuthMiddleware} from "../middlewares/jwtAuthMiddleware";
+import {refreshTokenMiddleware} from "../middlewares/refreshTokenMiddleware";
 
 export const securityRouter = Router();
 
@@ -21,13 +22,14 @@ securityRouter.get("/devices",
     res.status(200).json(mapped);
 });
 
-securityRouter.delete("/devices", async (req: Request, res: Response) => {
+securityRouter.delete("/devices",
+    refreshTokenMiddleware,
+    async (req: Request, res: Response) => {
     const refreshToken = req.cookies.refreshToken;
     if (!refreshToken){
         res.sendStatus(401);
         return;
     }
-
 
     const payload = jwtService.verifyRefreshToken(refreshToken);
     if (!payload || !payload.userId || !payload.deviceId) {
@@ -40,7 +42,9 @@ securityRouter.delete("/devices", async (req: Request, res: Response) => {
     res.sendStatus(204);
 });
 
-securityRouter.delete("/devices/:deviceId", async (req: Request, res: Response) => {
+securityRouter.delete("/devices/:deviceId",
+    refreshTokenMiddleware,
+    async (req: Request, res: Response) => {
     const refreshToken = req.cookies.refreshToken;
     if (!refreshToken) {
         res.sendStatus(401);
