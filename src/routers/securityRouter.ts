@@ -1,13 +1,12 @@
 import { Router, Request, Response } from "express";
 import { jwtService } from "../services/jwtService";
 import { sessionRepository } from "../repositories/sessionRepository";
-import {jwtAuthMiddleware} from "../middlewares/jwtAuthMiddleware";
 import {refreshTokenMiddleware} from "../middlewares/refreshTokenMiddleware";
 
 export const securityRouter = Router();
 
 securityRouter.get("/devices",
-    jwtAuthMiddleware,
+    refreshTokenMiddleware,
     async (req: Request, res: Response) => {
         const userId = req.userId;
         if (!userId) {
