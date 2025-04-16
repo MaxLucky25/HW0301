@@ -11,6 +11,8 @@ import { authService } from "../services/authService";
 import { userRepository } from "../repositories/userRepository";
 import {authRefreshTokenMiddleware} from "../middlewares/authRefreshTokenMiddleware";
 import {rateLimitMiddleware} from "../middlewares/rateLimitMiddleware";
+import { jwtService } from "../services/jwtService";
+import {sessionRepository} from "../repositories/sessionRepository";
 
 
 export const authRouter = Router();
@@ -18,8 +20,8 @@ export const authRouter = Router();
 
 
 authRouter.post('/login',
-    loginValidators,
     rateLimitMiddleware,
+    loginValidators,
     inputCheckErrorsMiddleware,
     async (req: Request, res: Response) => {
 
@@ -44,8 +46,8 @@ authRouter.post('/login',
 );
 
 authRouter.post('/refresh-token',
-    authRefreshTokenMiddleware,
     rateLimitMiddleware,
+    authRefreshTokenMiddleware,
     async (req: Request, res: Response) => {
     const refreshToken = req.cookies.refreshToken;
     if (!refreshToken){
@@ -73,21 +75,35 @@ authRouter.post('/refresh-token',
 
 
 authRouter.post('/logout',
-    authRefreshTokenMiddleware,
     rateLimitMiddleware,
+    authRefreshTokenMiddleware,
     async (req: Request, res: Response) => {
-    const refreshToken = req.cookies.refreshToken;
-    if (refreshToken) {
-        await authService.revokeRefreshToken(refreshToken);
-    }
+        const refreshToken = req.cookies.refreshToken;
+        if (!refreshToken) {
+            res.sendStatus(401);
+            return;
+        }
 
-    res.clearCookie('refreshToken');
-    res.sendStatus(204);
-});
+        const payload = jwtService.verifyRefreshToken(refreshToken);
+        if (!payload || !payload.deviceId) {
+            res.sendStatus(401);
+            return;
+        }
+
+        const session = await sessionRepository.findByDeviceId(payload.deviceId);
+        if (!session) {
+            res.sendStatus(401);
+            return;
+        }
+
+        await sessionRepository.deleteByDeviceId(payload.deviceId);
+        res.clearCookie('refreshToken');
+        res.sendStatus(204);
+    });
 
 authRouter.get('/me',
-    authJwtMiddleware,
     rateLimitMiddleware,
+    authJwtMiddleware,
     async (req: Request, res: Response) => {
     const userId = req.userId!;
     const user = await userRepository.getById(userId);
@@ -104,8 +120,8 @@ authRouter.get('/me',
 });
 
 authRouter.post('/registration',
-    registrationValidators,
     rateLimitMiddleware,
+    registrationValidators,
     inputCheckErrorsMiddleware,
     async (req: Request, res: Response): Promise<void>  => {
         const { login, password, email } = req.body;
@@ -116,12 +132,13 @@ authRouter.post('/registration',
             return;
         }
         res.sendStatus(204);
+        return;
     }
 );
 
 authRouter.post('/registration-confirmation',
-    confirmationValidators,
     rateLimitMiddleware,
+    confirmationValidators,
     inputCheckErrorsMiddleware,
     async (req: Request, res: Response) => {
         const confirmed = await authService.confirm(req.body.code);
@@ -134,8 +151,8 @@ authRouter.post('/registration-confirmation',
 );
 
 authRouter.post('/registration-email-resending',
-    emailResendingValidators,
     rateLimitMiddleware,
+    emailResendingValidators,
     inputCheckErrorsMiddleware,
     async (req: Request, res: Response) => {
         const code = await authService.resendEmail(req.body.email);
