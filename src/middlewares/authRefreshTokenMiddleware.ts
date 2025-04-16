@@ -3,7 +3,7 @@ import jwt, { JwtPayload } from 'jsonwebtoken';
 import config from '../utility/config';
 import { revokedTokenRepository } from '../repositories/revokedTokenRepository';
 
-export const refreshTokenMiddleware = async (req: Request, res: Response, next: NextFunction) => {
+export const authRefreshTokenMiddleware = async (req: Request, res: Response, next: NextFunction) => {
     const refreshToken = req.cookies?.refreshToken;
 
     if (!refreshToken) {
@@ -20,7 +20,7 @@ export const refreshTokenMiddleware = async (req: Request, res: Response, next: 
             return;
         }
 
-        // Добавим все поля как и в jwtAuthMiddleware
+        // Добавим все поля как и в authJwtMiddleware
         req.userId = decoded.userId;
         req.userLogin = decoded.login;
         req.userEmail = decoded.email;

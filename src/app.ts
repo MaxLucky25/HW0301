@@ -8,7 +8,6 @@ import cors from 'cors';
 import {commentRouter} from "./routers/commentRouters";
 import cookieParser from "cookie-parser";
 import { logRequestMiddleware } from './middlewares/logRequestMiddleware';
-import { requestCountMiddleware } from './middlewares/requestCountMiddleware';
 import { securityRouter } from './routers/securityRouter';
 
 
@@ -22,7 +21,6 @@ app.use(express.json());
 app.use(cors());
 app.use(cookieParser())
 app.use(logRequestMiddleware);
-app.use(requestCountMiddleware);
 
 
 app.use('/blogs', blogsRouter);

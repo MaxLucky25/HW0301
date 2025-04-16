@@ -1,11 +1,12 @@
 import { Router, Request, Response } from 'express';
 import { postValidators } from '../validators/postValidators';
-import { authMiddleware } from '../middlewares/authMiddleware';
-import { inputCheckErrorsMiddleware } from '../middlewares/validationMiddleware';
+import { authBasicMiddleware } from '../middlewares/authBasicMiddleware';
+import { inputCheckErrorsMiddleware } from '../middlewares/inputCheckErrorMiddleware';
 import {postService} from "../services/postService";
 import {commentService} from "../services/commentService";
-import {jwtAuthMiddleware} from "../middlewares/jwtAuthMiddleware";
+import {authJwtMiddleware} from "../middlewares/authJwtMiddleware";
 import {commentValidators} from "../validators/commentValidators";
+import {rateLimitMiddleware} from "../middlewares/rateLimitMiddleware";
 
 export const postsRouter = Router();
 
@@ -20,7 +21,8 @@ postsRouter.get('/:id', async (req: Request, res: Response) => {
 });
 
 postsRouter.post('/',
-    authMiddleware,
+    authBasicMiddleware,
+    rateLimitMiddleware,
     ...postValidators,
     inputCheckErrorsMiddleware,
     async (req: Request, res: Response) => {
@@ -30,7 +32,8 @@ postsRouter.post('/',
 );
 
 postsRouter.put('/:id',
-    authMiddleware,
+    authBasicMiddleware,
+    rateLimitMiddleware,
     ...postValidators,
     inputCheckErrorsMiddleware,
     async (req: Request, res: Response) => {
@@ -40,7 +43,8 @@ postsRouter.put('/:id',
 );
 
 postsRouter.delete('/:id',
-    authMiddleware,
+    authBasicMiddleware,
+    rateLimitMiddleware,
     async (req: Request, res: Response) => {
         const deleted = await postService.deletePost(req.params.id);
         deleted ? res.sendStatus(204) : res.sendStatus(404);
@@ -61,7 +65,8 @@ postsRouter.get('/:postId/comments', async (req: Request, res: Response) => {
 
 //  создание нового комментария (Bearer auth)
 postsRouter.post('/:postId/comments',
-    jwtAuthMiddleware,
+    authJwtMiddleware,
+    rateLimitMiddleware,
     commentValidators,
     inputCheckErrorsMiddleware,
     async (req: Request, res: Response) => {

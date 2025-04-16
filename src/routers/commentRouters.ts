@@ -1,15 +1,17 @@
 import { Router, Request, Response } from 'express';
-import { jwtAuthMiddleware } from '../middlewares/jwtAuthMiddleware';
-import { inputCheckErrorsMiddleware } from '../middlewares/validationMiddleware';
+import { authJwtMiddleware } from '../middlewares/authJwtMiddleware';
+import { inputCheckErrorsMiddleware } from '../middlewares/inputCheckErrorMiddleware';
 import { commentService } from '../services/commentService';
 import { commentValidators } from '../validators/commentValidators';
+import {rateLimitMiddleware} from "../middlewares/rateLimitMiddleware";
 
 
 export const commentRouter = Router();
 
 // Обновление комментария
 commentRouter.put('/:commentId',
-    jwtAuthMiddleware,
+    authJwtMiddleware,
+    rateLimitMiddleware,
     commentValidators,
     inputCheckErrorsMiddleware,
     async (req: Request, res: Response) => {
@@ -30,7 +32,8 @@ commentRouter.put('/:commentId',
 );
 // Удаление комментария
 commentRouter.delete('/:commentId',
-    jwtAuthMiddleware,
+    authJwtMiddleware,
+    rateLimitMiddleware,
     async (req: Request, res: Response) => {
         const { commentId } = req.params;
         const userId = req.userId!;

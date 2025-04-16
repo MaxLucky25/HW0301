@@ -1,6 +1,6 @@
 import {Router, Request, Response,} from "express";
-import { inputCheckErrorsMiddleware } from "../middlewares/validationMiddleware";
-import { jwtAuthMiddleware } from "../middlewares/jwtAuthMiddleware";
+import { inputCheckErrorsMiddleware } from "../middlewares/inputCheckErrorMiddleware";
+import { authJwtMiddleware } from "../middlewares/authJwtMiddleware";
 import {
     confirmationValidators,
     emailResendingValidators,
@@ -9,7 +9,8 @@ import {
 } from "../validators/authValidators";
 import { authService } from "../services/authService";
 import { userRepository } from "../repositories/userRepository";
-import {refreshTokenMiddleware} from "../middlewares/refreshTokenMiddleware";
+import {authRefreshTokenMiddleware} from "../middlewares/authRefreshTokenMiddleware";
+import {rateLimitMiddleware} from "../middlewares/rateLimitMiddleware";
 
 
 export const authRouter = Router();
@@ -42,7 +43,8 @@ authRouter.post('/login',
 );
 
 authRouter.post('/refresh-token',
-    refreshTokenMiddleware,
+    authRefreshTokenMiddleware,
+    rateLimitMiddleware,
     async (req: Request, res: Response) => {
     const refreshToken = req.cookies.refreshToken;
     if (!refreshToken){
@@ -70,7 +72,8 @@ authRouter.post('/refresh-token',
 
 
 authRouter.post('/logout',
-    refreshTokenMiddleware,
+    authRefreshTokenMiddleware,
+    rateLimitMiddleware,
     async (req: Request, res: Response) => {
     const refreshToken = req.cookies.refreshToken;
     if (refreshToken) {
@@ -82,7 +85,8 @@ authRouter.post('/logout',
 });
 
 authRouter.get('/me',
-    jwtAuthMiddleware,
+    authJwtMiddleware,
+    rateLimitMiddleware,
     async (req: Request, res: Response) => {
     const userId = req.userId!;
     const user = await userRepository.getById(userId);

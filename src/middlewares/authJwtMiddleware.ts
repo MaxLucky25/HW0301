@@ -4,7 +4,7 @@ import config from "../utility/config";
 
 
 
-export const jwtAuthMiddleware = (req: Request, res: Response, next: NextFunction) => {
+export const authJwtMiddleware = (req: Request, res: Response, next: NextFunction) => {
     const authHeader = req.headers.authorization;
 
     if (!authHeader || !authHeader.startsWith('Bearer ')) {

@@ -8,7 +8,7 @@ dotenv.config();
 const ADMIN_LOGIN = process.env.ADMIN_LOGIN;
 const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD;
 
-export const authMiddleware = (
+export const authBasicMiddleware = (
     req: Request,
     res: Response,
     next: NextFunction
