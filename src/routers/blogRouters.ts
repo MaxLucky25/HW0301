@@ -4,7 +4,6 @@ import { authBasicMiddleware } from '../middlewares/authBasicMiddleware';
 import { inputCheckErrorsMiddleware } from '../middlewares/inputCheckErrorMiddleware';
 import {postForSpecificBlogValidators} from "../validators/postForSpecificBlogValidators";
 import {blogService} from "../services/blogService";
-import {rateLimitMiddleware} from "../middlewares/rateLimitMiddleware";
 
 export const blogsRouter = Router();
 
@@ -20,7 +19,6 @@ blogsRouter.get('/:id', async (req, res) => {
 
 blogsRouter.post('/',
     authBasicMiddleware,
-    rateLimitMiddleware,
     ...blogValidators,
     inputCheckErrorsMiddleware,
     async (req, res) => {
@@ -31,7 +29,6 @@ blogsRouter.post('/',
 
 blogsRouter.put('/:id',
     authBasicMiddleware,
-    rateLimitMiddleware,
     ...blogValidators,
     inputCheckErrorsMiddleware,
     async (req, res) => {
@@ -42,7 +39,6 @@ blogsRouter.put('/:id',
 
 blogsRouter.delete('/:id',
     authBasicMiddleware,
-    rateLimitMiddleware,
     async (req, res) => {
         const deleted = await blogService.deleteBlog(req.params.id);
         deleted ? res.sendStatus(204) : res.sendStatus(404);
@@ -62,7 +58,6 @@ blogsRouter.get('/:id/posts', async (req, res) => {
 
 blogsRouter.post('/:id/posts',
     authBasicMiddleware,
-    rateLimitMiddleware,
     ...postForSpecificBlogValidators,
     inputCheckErrorsMiddleware,
     async (req, res) => {

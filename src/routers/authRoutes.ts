@@ -19,6 +19,7 @@ export const authRouter = Router();
 
 authRouter.post('/login',
     loginValidators,
+    rateLimitMiddleware,
     inputCheckErrorsMiddleware,
     async (req: Request, res: Response) => {
 
@@ -104,6 +105,7 @@ authRouter.get('/me',
 
 authRouter.post('/registration',
     registrationValidators,
+    rateLimitMiddleware,
     inputCheckErrorsMiddleware,
     async (req: Request, res: Response): Promise<void>  => {
         const { login, password, email } = req.body;
@@ -119,6 +121,7 @@ authRouter.post('/registration',
 
 authRouter.post('/registration-confirmation',
     confirmationValidators,
+    rateLimitMiddleware,
     inputCheckErrorsMiddleware,
     async (req: Request, res: Response) => {
         const confirmed = await authService.confirm(req.body.code);
@@ -132,6 +135,7 @@ authRouter.post('/registration-confirmation',
 
 authRouter.post('/registration-email-resending',
     emailResendingValidators,
+    rateLimitMiddleware,
     inputCheckErrorsMiddleware,
     async (req: Request, res: Response) => {
         const code = await authService.resendEmail(req.body.email);

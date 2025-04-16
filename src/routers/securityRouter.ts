@@ -2,13 +2,11 @@ import { Router, Request, Response } from "express";
 import { jwtService } from "../services/jwtService";
 import { sessionRepository } from "../repositories/sessionRepository";
 import {authRefreshTokenMiddleware} from "../middlewares/authRefreshTokenMiddleware";
-import {rateLimitMiddleware} from "../middlewares/rateLimitMiddleware";
 
 export const securityRouter = Router();
 
 securityRouter.get("/devices",
     authRefreshTokenMiddleware,
-    rateLimitMiddleware,
     async (req: Request, res: Response) => {
         const userId = req.userId;
         if (!userId) {
@@ -29,7 +27,6 @@ securityRouter.get("/devices",
 
 securityRouter.delete("/devices",
     authRefreshTokenMiddleware,
-    rateLimitMiddleware,
     async (req: Request, res: Response) => {
     const refreshToken = req.cookies.refreshToken;
     if (!refreshToken){
@@ -50,7 +47,6 @@ securityRouter.delete("/devices",
 
 securityRouter.delete("/devices/:deviceId",
     authRefreshTokenMiddleware,
-    rateLimitMiddleware,
     async (req: Request, res: Response) => {
     const refreshToken = req.cookies.refreshToken;
     if (!refreshToken) {

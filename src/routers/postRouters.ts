@@ -6,7 +6,7 @@ import {postService} from "../services/postService";
 import {commentService} from "../services/commentService";
 import {authJwtMiddleware} from "../middlewares/authJwtMiddleware";
 import {commentValidators} from "../validators/commentValidators";
-import {rateLimitMiddleware} from "../middlewares/rateLimitMiddleware";
+
 
 export const postsRouter = Router();
 
@@ -22,7 +22,6 @@ postsRouter.get('/:id', async (req: Request, res: Response) => {
 
 postsRouter.post('/',
     authBasicMiddleware,
-    rateLimitMiddleware,
     ...postValidators,
     inputCheckErrorsMiddleware,
     async (req: Request, res: Response) => {
@@ -33,7 +32,6 @@ postsRouter.post('/',
 
 postsRouter.put('/:id',
     authBasicMiddleware,
-    rateLimitMiddleware,
     ...postValidators,
     inputCheckErrorsMiddleware,
     async (req: Request, res: Response) => {
@@ -44,7 +42,6 @@ postsRouter.put('/:id',
 
 postsRouter.delete('/:id',
     authBasicMiddleware,
-    rateLimitMiddleware,
     async (req: Request, res: Response) => {
         const deleted = await postService.deletePost(req.params.id);
         deleted ? res.sendStatus(204) : res.sendStatus(404);
@@ -66,7 +63,6 @@ postsRouter.get('/:postId/comments', async (req: Request, res: Response) => {
 //  создание нового комментария (Bearer auth)
 postsRouter.post('/:postId/comments',
     authJwtMiddleware,
-    rateLimitMiddleware,
     commentValidators,
     inputCheckErrorsMiddleware,
     async (req: Request, res: Response) => {
